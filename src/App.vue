@@ -1,18 +1,20 @@
 <template>
   <div id="app">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <md-toolbar>
+      <h3 class="md-title">Di Santi - Store</h3>
+      <md-button class="md-primary" @click="logout">Sair</md-button>
+    </md-toolbar>
+    <div class="view-container">
+      <router-view/>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import firebase from 'firebase'
 
 export default {
   name: 'app',
-  components: {
-    HelloWorld
-  },
   created() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -29,8 +31,8 @@ export default {
       } catch (error) {
         // exibir mensagem erro
       } finally {
+        this.$router.push('/')
         /* 
-        self.$router.push('/login')
         self.$store.state.loggedUser = ''
         */
       }
@@ -39,13 +41,9 @@ export default {
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+  .view-container {
+    width: 100%;
+    padding: 28px;
+  }
 </style>
