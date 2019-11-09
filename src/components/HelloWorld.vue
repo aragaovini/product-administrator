@@ -1,34 +1,53 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    
-    <input v-model="email">
-    <input v-model="senha">
+  <md-progress-bar v-show="isLoading" md-mode="query"></md-progress-bar>
+  <h1>Di Santi - Store</h1>
+    <md-field>
+      <label>E-mail</label>
+      <md-input v-model="email" type="email"/>
+    </md-field>
+    <md-field>
+      <label>Senha</label>
+      <md-input v-model="senha" type="password"/>
+    </md-field>
 
-    <button @click="save">salvar</button>
+    <MdButton :loading="true" class="md-primary md-raised" @click="save">salvar</MdButton>
   </div>
 </template>
 
 <script>
 import * as firebase from 'firebase'
+
 export default {
   name: 'HelloWorld',
+  components: {
+    
+  },
   data: () => ({
     email: '',
-    senha: ''
+    senha: '',
+    isLoading: false
   }),
   props: {
     msg: String
   },
   methods: {
-    save() {
+    async save() {
       const {
         email,
         senha
       } = this
-      firebase.auth().signInWithEmailAndPassword(email, senha).catch(error => {
-        alert(error)
-      })
+
+      try {
+        this.isLoading = true
+        const data = await firebase.auth().signInWithEmailAndPassword(email, senha)
+        debugger // eslint-disable-line
+        return data
+      } catch(error) {
+        this.isLoading = false
+      } finally {
+        this.isLoading = false
+      }
     }
   }
 }
