@@ -10,10 +10,10 @@
           <h3>Dados pessoais</h3>
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
-              <md-field :class="getValidationClass('firstName')">
-                <label for="first-name">Nome Completo</label>
-                <md-input name="first-name" id="first-name" autocomplete="given-name" v-model="form.firstName" :disabled="sending" />
-                <span class="md-error" v-if="!$v.form.firstName.required">Campo obrigatório</span>
+              <md-field :class="getValidationClass('name')">
+                <label for="name">Nome Completo</label>
+                <md-input name="name" id="name" autocomplete="given-name" v-model="form.name" :disabled="sending" />
+                <span class="md-error" v-if="!$v.form.name.required">Campo obrigatório</span>
               </md-field>
             </div>
           </div>
@@ -33,11 +33,10 @@
             </div>
           </div>
 
-          <md-field :class="getValidationClass('email')">
-            <label for="email">Data de nascimento</label>
-            <md-input type="email" name="email" id="email" autocomplete="email" v-model="form.email" :disabled="sending" />
-            <span class="md-error" v-if="!$v.form.email.required">Campo obrigatório</span>
-            <span class="md-error" v-else-if="!$v.form.email.email">E-mail inválido</span>
+          <md-field :class="getValidationClass('birthDate')">
+            <label for="birthDate">Data de nascimento</label>
+            <md-input type="text" name="birthDate" id="birthDate" v-model="form.birthDate" :disabled="sending" />
+            <span class="md-error" v-if="!$v.form.birthDate.required">Campo obrigatório</span>
           </md-field>
 
           <md-field :class="getValidationClass('email')">
@@ -49,42 +48,41 @@
 
           <h3>Endereço</h3>
           <div class="md-layout-item md-small-size-100">
-              <md-field :class="getValidationClass('firstName')">
-                <label for="first-name">Logradouro</label>
-                <md-input name="first-name" id="first-name" autocomplete="given-name" v-model="form.firstName" :disabled="sending" />
-                <span class="md-error" v-if="!$v.form.firstName.required">Campo obrigatório</span>
+              <md-field :class="getValidationClass('logradouro')">
+                <label for="logradouro">Logradouro</label>
+                <md-input name="logradouro" id="logradouro" v-model="form.logradouro" :disabled="sending" />
+                <span class="md-error" v-if="!$v.form.logradouro.required">Campo obrigatório</span>
               </md-field>
             </div>
 
             <div class="md-layout-item md-small-size-100">
-              <md-field :class="getValidationClass('firstName')">
-                <label for="first-name">Número</label>
-                <md-input name="first-name" id="first-name" autocomplete="given-name" v-model="form.firstName" :disabled="sending" />
-                <span class="md-error" v-if="!$v.form.firstName.required">Campo obrigatório</span>
+              <md-field :class="getValidationClass('numero')">
+                <label for="numero">Número</label>
+                <md-input name="numero" id="numero" autocomplete="given-name" v-model="form.numero" :disabled="sending" />
+                <span class="md-error" v-if="!$v.form.numero.required">Campo obrigatório</span>
               </md-field>
             </div>
 
             <div class="md-layout-item md-small-size-100">
-              <md-field :class="getValidationClass('firstName')">
+              <md-field :class="getValidationClass('complemento')">
                 <label for="first-name">Complemento</label>
-                <md-input name="first-name" id="first-name" autocomplete="given-name" v-model="form.firstName" :disabled="sending" />
-                <span class="md-error" v-if="!$v.form.firstName.required">Campo obrigatório</span>
+                <md-input name="complemento" id="complemento" v-model="form.complemento" :disabled="sending" />
               </md-field>
             </div>
 
             <div class="md-layout-item md-small-size-100">
-              <md-field :class="getValidationClass('firstName')">
-                <label for="first-name">Cidade</label>
-                <md-input name="first-name" id="first-name" autocomplete="given-name" v-model="form.firstName" :disabled="sending" />
-                <span class="md-error" v-if="!$v.form.firstName.required">Campo obrigatório</span>
+              <md-field :class="getValidationClass('cidade')">
+                <label for="cidade">Cidade</label>
+                <md-input name="cidade" id="cidade" autocomplete="given-name" v-model="form.cidade" :disabled="sending" />
+                <span class="md-error" v-if="!$v.form.cidade.required">Campo obrigatório</span>
               </md-field>
             </div>
 
             <div class="md-layout-item md-small-size-100">
-              <md-field :class="getValidationClass('firstName')">
-                <label for="first-name">UF</label>
-                <md-input name="first-name" id="first-name" autocomplete="given-name" v-model="form.firstName" :disabled="sending" />
-                <span class="md-error" v-if="!$v.form.firstName.required">Campo obrigatório</span>
+              <md-field :class="getValidationClass('uf')">
+                <label for="uf">UF</label>
+                <md-input name="uf" id="uf" v-model="form.uf" :disabled="sending" />
+                <span class="md-error" v-if="!$v.form.uf.required">Campo obrigatório</span>
               </md-field>
             </div>
         </md-card-content>
@@ -102,22 +100,27 @@
 </template>
 
 <script>
-import { validationMixin } from 'vuelidate'
+  import { validationMixin } from 'vuelidate'
   import {
     required,
     email
   } from 'vuelidate/lib/validators'
+  import saveCustomer from '../../services/clientes'
 
   export default {
     name: 'FormValidation',
     mixins: [validationMixin],
     data: () => ({
       form: {
-        firstName: null,
-        lastName: null,
+        name: null,
         gender: null,
-        age: null,
+        birthDate: null,
         email: null,
+        logradouro: null,
+        numero: null,
+        complemento: null,
+        cidade: 'Palmital',
+        uf: 'SP'
       },
       userSaved: false,
       sending: false,
@@ -125,16 +128,14 @@ import { validationMixin } from 'vuelidate'
     }),
     validations: {
       form: {
-        firstName: {
-          required,
-        },
-        gender: {
-          required
-        },
-        email: {
-          required,
-          email
-        }
+        name: { required },
+        gender: { required },
+        birthDate: { required },
+        email: { required, email },
+        logradouro: { required },
+        numero: { required },
+        cidade: { required },
+        uf: { required }
       }
     },
     methods: {
@@ -155,16 +156,11 @@ import { validationMixin } from 'vuelidate'
         this.form.gender = null
         this.form.email = null
       },
-      saveUser () {
+      async saveUser () {
         this.sending = true
-
-        // Instead of this timeout, here you can call your API
-        window.setTimeout(() => {
-          this.lastUser = `${this.form.firstName} ${this.form.lastName}`
-          this.userSaved = true
-          this.sending = false
-          this.clearForm()
-        }, 1500)
+        const customer = { ...this.form }
+        await saveCustomer(customer)
+        
       },
       validateUser () {
         this.$v.$touch()
