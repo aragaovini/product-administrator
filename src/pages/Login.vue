@@ -14,7 +14,7 @@
         <md-input v-model="senha" type="password"/>
       </md-field>
 
-      <MdButton :loading="true" class="md-primary md-raised" @click="save">entrar</MdButton>
+      <MdButton @keypress.enter="save" :loading="true" class="md-primary md-raised" @click="save">entrar</MdButton>
     </md-card>
   </div>
 </template>
@@ -54,7 +54,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
 .login-container {

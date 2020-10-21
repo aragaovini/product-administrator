@@ -3,7 +3,7 @@
     <form novalidate class="md-layout" @submit.prevent="validateUser">
       <md-card class="md-layout-item cliente-container">
         <md-card-header>
-          <div class="md-title">Cadastrar cliente</div>
+          <div class="md-title">{{idParam ? 'Atualizar' : 'Cadastrar'}} cliente</div>
         </md-card-header>
 
         <md-card-content>
@@ -17,6 +17,13 @@
               </md-field>
             </div>
           </div>
+
+          <md-field :class="getValidationClass('cpf')">
+            <label for="cpf">CPF</label>
+            <md-input type="text" name="cpf" id="cpf" v-mask="'###.###.###-##'" v-model="form.cpf" :disabled="sending" />
+            <span class="md-error" v-if="!$v.form.cpf.required">Campo obrigatório</span>
+            <span class="md-error" v-else-if="!$v.form.cpf.isCpfValid">CPF inválido</span>
+          </md-field>
 
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
@@ -35,12 +42,12 @@
 
           <md-field :class="getValidationClass('birthDate')">
             <label for="birthDate">Data de nascimento</label>
-            <md-input type="text" name="birthDate" id="birthDate" v-model="form.birthDate" :disabled="sending" />
+            <md-input type="text" name="birthDate" id="birthDate" v-mask="'##/##/####'" v-model="form.birthDate" :disabled="sending" />
             <span class="md-error" v-if="!$v.form.birthDate.required">Campo obrigatório</span>
           </md-field>
 
           <md-field :class="getValidationClass('email')">
-            <label for="email">Email</label>
+            <label for="email">E-mail</label>
             <md-input type="email" name="email" id="email" autocomplete="email" v-model="form.email" :disabled="sending" />
             <span class="md-error" v-if="!$v.form.email.required">Campo obrigatório</span>
             <span class="md-error" v-else-if="!$v.form.email.email">E-mail inválido</span>
@@ -90,7 +97,7 @@
         <md-progress-bar md-mode="indeterminate" v-if="sending" />
 
         <md-card-actions>
-          <md-button type="submit" class="md-primary md-raised" :disabled="sending">Cadastrar</md-button>
+          <md-button type="submit" class="md-primary md-raised" :disabled="sending">{{ idParam ? 'Atualizar' : 'Cadastrar'}}</md-button>
         </md-card-actions>
       </md-card>
 
@@ -105,7 +112,8 @@
     required,
     email
   } from 'vuelidate/lib/validators'
-  import saveCustomer from '../../services/clientes'
+  import { saveCustomer, getCustomerById, updateCustomer } from '../../services/clientes'
+  import isCpfValid from '../../utils/cpf'
 
   export default {
     name: 'FormValidation',
@@ -113,6 +121,7 @@
     data: () => ({
       form: {
         name: null,
+        cpf: '',
         gender: null,
         birthDate: null,
         email: null,
@@ -129,6 +138,7 @@
     validations: {
       form: {
         name: { required },
+        cpf: { required, isCpfValid },
         gender: { required },
         birthDate: { required },
         email: { required, email },
@@ -136,6 +146,23 @@
         numero: { required },
         cidade: { required },
         uf: { required }
+      }
+    },
+    computed: {
+      idParam() {
+        return this.$route.params.id
+      }
+    },
+    async created() {
+      if (this.idParam) {
+        const userDoc = await getCustomerById(this.idParam)
+        if (userDoc.exists) {
+          const user = userDoc.data();
+          this.form = {
+            ...this.form,
+            ...user,
+          }
+        }
       }
     },
     methods: {
@@ -157,18 +184,22 @@
         this.form.email = null
       },
       async saveUser () {
-        this.sending = true
+        const idCustomer = this.idParam;
         const customer = { ...this.form }
-        await saveCustomer(customer)
-        
+        this.sending = true
+        if (idCustomer) {
+          await updateCustomer(customer, idCustomer)
+        } else {
+          await saveCustomer(customer)
+        }        
+        this.sending = false
       },
       validateUser () {
         this.$v.$touch()
-
         if (!this.$v.$invalid) {
           this.saveUser()
         }
-      }
+      },
     }
   }
 </script>
