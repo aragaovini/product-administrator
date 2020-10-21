@@ -5,7 +5,7 @@
     <div class="container">
 
       <div class="container__column">
-        <md-card @click="addVenda" class="container__item card-option card-option--row">
+        <md-card @click.native="addVenda" class="container__item card-option card-option--row">
           Adicionar venda
         </md-card>
         <md-card class="container__item card-option card-option--row">

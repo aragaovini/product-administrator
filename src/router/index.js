@@ -74,13 +74,13 @@ const routes = [
   {
     path: '/produtos/consultar/:id',
     name: 'consultarProdutosById',
-    component: CadastrarProduto,
+    component: ConsultarProduto,
     meta: {
       requiresAuth: true
     }
   },
   {
-    path: '/vendas/adicionar',
+    path: '/vendas/adicionar/:idCustomer',
     name: 'adicionarVenda',
     component: AdicionarVenda,
     meta: {
