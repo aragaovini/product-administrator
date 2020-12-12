@@ -1,4 +1,5 @@
 import firebase from 'firebase'
+import { normalizeString } from '../utils/stringNormalizer'
 
 const getProductById = (productId) => {
     return firebase.firestore().collection('product')
@@ -19,18 +20,13 @@ const getProducts = () => {
     .get()
 }
 
-// const getProductByCode = (searchTerm) => {
-//     if (!searchTerm) return [];
-//     const collection = firebase.firestore().collection('product')
-//     collection.where('codigo', '>=', searchTerm).where('codigo', '<=', searchTerm + '\uf8ff')
-//     return collection.get()
-// }
-
 const getProductByDescription = (searchTerm) => {
+    const term = normalizeString(searchTerm)
+
     const collection = firebase.firestore().collection('product')
-    .orderBy("descricao")
-    .startAt(searchTerm)
-    .endAt(searchTerm + "\uf8ff");
+    .orderBy("normalizedDescricao")
+    .startAt(term)
+    .endAt(term + "\uf8ff");
 
     return collection.get()
 }
@@ -44,7 +40,7 @@ const getProductByCode = (searchTerm) => {
     return collection.get()
 }
 
-const getProductByCodeOrDescription = async (searchTerm) => {
+const getProductByCodeOrDescription = async (searchTerm, returnId = false) => {
     if (!searchTerm) return [];
 
     const [descriptionDoc, codeDoc] =  await Promise.all([
@@ -52,15 +48,31 @@ const getProductByCodeOrDescription = async (searchTerm) => {
         getProductByCode(searchTerm),
     ])
 
-    const descriptionList = descriptionDoc.docs.map(item => item.data())
-    const codeList = codeDoc.docs.map(item => item.data())
-
-    return [
+    const descriptionList = descriptionDoc.docs.map(item => {
+        if (returnId) {
+            return {
+                id: item.id,
+                ...item.data()
+            }
+        }
+        item.data()
+    })
+    const codeList = codeDoc.docs.map(item => {
+        if (returnId) {
+            return {
+                id: item.id,
+                ...item.data()
+            }
+        }
+        item.data()
+    })
+    const itemsSet = [
         ...new Set([
             ...descriptionList,
             ...codeList,
         ])
     ]
+    return itemsSet.filter(item => item.quantidade > 0)
 
     
 }

@@ -114,6 +114,7 @@
   } from 'vuelidate/lib/validators'
   import { saveCustomer, getCustomerById, updateCustomer } from '../../services/clientes'
   import isCpfValid from '../../utils/cpf'
+  import { normalizeString, removeNonNumbers } from '../../utils/stringNormalizer'
 
   export default {
     name: 'FormValidation',
@@ -175,17 +176,13 @@
           }
         }
       },
-      clearForm () {
-        this.$v.$reset()
-        this.form.firstName = null
-        this.form.lastName = null
-        this.form.age = null
-        this.form.gender = null
-        this.form.email = null
-      },
       async saveUser () {
         const idCustomer = this.idParam;
-        const customer = { ...this.form }
+        const customer = { 
+          ...this.form,
+          normalizedCpf: removeNonNumbers(this.form.cpf),
+          normalizedName: normalizeString(this.form.name),
+        }
         this.sending = true
         if (idCustomer) {
           await updateCustomer(customer, idCustomer)

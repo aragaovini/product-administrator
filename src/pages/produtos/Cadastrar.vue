@@ -60,8 +60,8 @@
           </md-field>
 
           <md-field :class="getValidationClass('quantidade')">
-            <label for="quantidade">Quantidade</label>
-            <md-input min="0" type="number" name="quantidade" id="quantidade" v-model="form.quantidade" :disabled="sending" />
+            <label for="quantidade">Quantidade em estoque</label>
+            <md-input min="0" type="number" name="quantidade" id="quantidade" v-model.number="form.quantidade" :disabled="sending" />
           </md-field>
         </md-card-content>
 
@@ -83,6 +83,7 @@
   import { saveProduct, getProductById, updateProduct } from '../../services/produtos'
   import getNumberCurrency from '../../utils/currency'
   import deveMostrarCampoTamanho from '../../utils/produtos'
+   import { normalizeString } from '../../utils/stringNormalizer'
 
   export default {
     name: 'FormValidation',
@@ -143,13 +144,16 @@
         }
       },
       async handleProduct () {        
-        const precoCusto = getNumberCurrency(this.form.precoCusto);
-        const precoVenda = getNumberCurrency(this.form.precoVenda);
+        const precoCusto = getNumberCurrency(this.form.precoCusto)
+        const precoVenda = getNumberCurrency(this.form.precoVenda)
+        const quantidade = Number(this.form.quantidade)
 
         const product = { 
             ...this.form,
+            normalizedDescricao: normalizeString(this.form.descricao),
             precoVenda,
             precoCusto,
+            quantidade,
         }
 
         this.sending = true

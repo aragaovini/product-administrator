@@ -9,6 +9,7 @@ import store from './store'
 import { mask } from 'vue-the-mask'
 import { VMoney } from 'v-money'
 import VueCurrencyFilter from 'vue-currency-filter'
+import './quasar'
 
 Vue.directive('mask', mask)
 Vue.directive('money', VMoney)

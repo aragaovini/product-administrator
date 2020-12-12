@@ -105,7 +105,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
   #app {
     display: flex;
     flex-direction: column;
@@ -120,5 +120,14 @@ export default {
 
   .md-title {
     cursor: pointer;
+  }
+
+  h1 {
+    font-size: 28px !important;
+    margin-top: 0px;
+  }
+
+  h2 {
+    font-size: 24px !important;
   }
 </style>
