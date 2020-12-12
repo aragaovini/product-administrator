@@ -305,7 +305,6 @@ export default {
                 ...value,
                 quantidadeCarrinho: 1,
                 precoTotalItem: value.precoVenda,
-                precoSemDesconto: value.precoVenda,
             }
 
             this.shoppingCart.push(product)
@@ -362,6 +361,7 @@ export default {
                         dataPagamento: new Date(),
                         saldoDevedor: valorTotalAPagar - valorTotalPago
                     }],
+                    situacao: 'ATIVA',
                 }
 
                 await finalizarVenda(venda)

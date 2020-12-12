@@ -7,6 +7,7 @@ const buscarVendasByMesAno = (mes, ano) => {
     const collection = firebase.firestore().collection('sales')
     .where('dataVenda', '>=', firstDate)
     .where('dataVenda', '<', lastDate)
+    .where('situacao', '==', 'ATIVA')
 
     return collection.get()
 }
@@ -29,13 +30,6 @@ const finalizarVenda = async (venda) => {
             historicoVenda = [ venda ]
         }
 
-        /*
-            if (isEdicao) {
-                pega o produto pelo codigo,
-                soma a quantidade do produto com a da venda para restaurar o valor anterior
-                e depois subtraia tudo do novo
-            }
-        */
         return updateProduct({
             quantidade: produto.quantidade - produto.quantidadeCarrinho,
             historicoVenda,
