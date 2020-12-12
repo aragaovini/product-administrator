@@ -10,6 +10,7 @@ import { mask } from 'vue-the-mask'
 import { VMoney } from 'v-money'
 import VueCurrencyFilter from 'vue-currency-filter'
 import './quasar'
+import moment from 'moment';
 
 Vue.directive('mask', mask)
 Vue.directive('money', VMoney)
@@ -25,6 +26,18 @@ Vue.use(VueCurrencyFilter,
     avoidEmptyDecimals: undefined,
   }
 )
+
+Vue.filter('formatDate', function(value) {
+    if (value) {
+        return moment(String(value)).format('DD/MM/YYYY')
+    }
+});
+
+Vue.filter('formatDateHour', function(value) {
+  if (value) {
+      return moment(String(value)).format('DD/MM/YYYY HH:mm')
+  }
+});
 
 Vue.use(VueMaterial)
 

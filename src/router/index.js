@@ -11,6 +11,7 @@ import CadastrarProduto from '../pages/produtos/Cadastrar'
 import ConsultarProduto from '../pages/produtos/Consultar'
 
 import AdicionarVenda from '../pages/vendas/Adicionar'
+import ConsultarVendas from '../pages/vendas/Consultar'
 
 Vue.use(Router)
 
@@ -87,6 +88,14 @@ const routes = [
       requiresAuth: true
     }
   },
+  {
+    path: '/vendas/consultar',
+    name: 'consultarVendas',
+    component: ConsultarVendas,
+    meta: {
+      requiresAuth: true
+    }
+  }
 ]
 
 const router = new Router({

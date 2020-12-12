@@ -372,7 +372,10 @@ export default {
                     message: 'Venda efetuada com sucesso!'
                 })
             } catch {
-                // TODO snack
+                this.$q.notify({
+                    type: 'negative',
+                    message: 'Falha ao efetuar venda.'
+                })
             }
         },
         handleDiscountDialogOpen() {
