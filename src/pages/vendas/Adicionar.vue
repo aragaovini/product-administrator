@@ -385,9 +385,7 @@ export default {
                     type: 'positive',
                     message: 'Venda efetuada com sucesso!'
                 })
-            } catch(error) {
-                /* eslint-disable */
-                console.log(error)
+            } catch {
                 this.$q.notify({
                     type: 'negative',
                     message: 'Falha ao efetuar venda.'
