@@ -18,14 +18,11 @@ const atualizarVenda = (venda, docId) => {
 }
 
 const finalizarVenda = async (venda) => {
-    let historicoVenda = []
-
-    await firebase.firestore().collection('sales')
-        .doc().set(venda)
-    
     const promises = venda.produtos.map(produto => {
-        if (produto.historicoVenda && produto.historicoVenda.length) {
-            historicoVenda = produto.historicoVenda.push(venda)
+        let historicoVenda = produto.historicoVenda ? [ ...produto.historicoVenda ] : []
+
+        if (historicoVenda && historicoVenda.length) {
+            historicoVenda.push(venda)
         } else {
             historicoVenda = [ venda ]
         }
@@ -35,6 +32,15 @@ const finalizarVenda = async (venda) => {
             historicoVenda,
         }, produto.id)
     })
+
+    venda.produtos.forEach(produto => {
+        delete produto.historicoVenda
+        return produto
+    })
+
+    const salvarVenda = firebase.firestore().collection('sales').doc().set(venda)
+
+    promises.push(salvarVenda)
 
     await Promise.all(promises)
 }

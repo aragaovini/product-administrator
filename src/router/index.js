@@ -73,9 +73,9 @@ const routes = [
     }
   },
   {
-    path: '/produtos/consultar/:id',
+    path: '/produtos/editar/:id',
     name: 'consultarProdutosById',
-    component: ConsultarProduto,
+    component: CadastrarProduto,
     meta: {
       requiresAuth: true
     }

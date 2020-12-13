@@ -93,10 +93,20 @@
             </div>
             <p>Quantidade de itens: {{ shoppingCartTotaItems }}</p>
             <p><b>Total a pagar: {{ descontoGeral ? shoppingCartTotalWithDiscount : shoppingCartTotal }}</b></p>
+
+            <br>
+            <br>
+            <p>Selecione a forma de pagamento: </p>
+            <div class="q-gutter-sm">
+                <q-radio v-model="formaPagamento" val="dinheiro" label="Dinheiro" />
+                <q-radio v-model="formaPagamento" val="debito" label="Cartão de Débito" />
+                <q-radio v-model="formaPagamento" val="credito" label="Cartão de Crédito" />
+                <q-radio v-model="formaPagamento" val="naoPago" label="Não pago" />
+            </div>
         </div>
 
         <div class="action-box">
-            <q-btn color="green" @click="openTotalPaidDialog = true" :disable="!shoppingCart.length">
+            <q-btn color="green" @click="handleValorPagoModal" :disable="!shoppingCart.length">
                 Finalizar venda
             </q-btn>
         </div>
@@ -230,6 +240,7 @@ export default {
         },
         openDiscountDialog: false,
         descontoGeral: 0,
+        formaPagamento: ''
 
     }),
     computed: {
@@ -347,6 +358,7 @@ export default {
 
                 const valorTotalAPagar = desconto ? valorTotalDesconto : valorTotal
                 const valorTotalPago = getNumberCurrency(this.totalPaid)
+                 
 
                 const venda = {
                     cliente: this.customer,
@@ -362,16 +374,20 @@ export default {
                         saldoDevedor: valorTotalAPagar - valorTotalPago
                     }],
                     situacao: 'ATIVA',
+                    formaPagamento: this.formaPagamento
                 }
 
                 await finalizarVenda(venda)
                 this.shoppingCart = []
                 this.descontoGeral = 0
+                this.formaPagamento = ''
                 this.$q.notify({
                     type: 'positive',
                     message: 'Venda efetuada com sucesso!'
                 })
-            } catch {
+            } catch(error) {
+                /* eslint-disable */
+                console.log(error)
                 this.$q.notify({
                     type: 'negative',
                     message: 'Falha ao efetuar venda.'
@@ -402,6 +418,16 @@ export default {
                 this.openDiscountDialog = false
                 this.descontoGeral = this.descontoGeral || 0
             }
+        },
+        handleValorPagoModal() {
+            if (!this.formaPagamento) {
+                this.$q.notify({
+                    type: 'negative',
+                    message: 'Por favor, selecione a forma de pagamento.'
+                })
+                return
+            }
+            this.openTotalPaidDialog = true
         }
     }
 }

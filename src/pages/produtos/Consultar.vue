@@ -62,7 +62,7 @@ export default {
             }
         },
         goToProductDetails(product) {
-            this.$router.push(`/produtos/consultar/${product.id}`)
+            this.$router.push(`/produtos/editar/${product.id}`)
         },
         handleVisibilityPrecoCusto(product) {
             product.showPrecoCusto = !product.showPrecoCusto
