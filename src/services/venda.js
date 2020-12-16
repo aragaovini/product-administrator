@@ -12,6 +12,14 @@ const buscarVendasByMesAno = (mes, ano) => {
     return collection.get()
 }
 
+const buscarVendasPagtoPendente = () => {
+    const collection = firebase.firestore().collection('sales')
+    .where('statusPagamento', '==', 'PENDENTE')
+    .where('situacao', '==', 'ATIVA')
+    .orderBy('dataVenda')
+    return collection.get()
+}
+
 const atualizarVenda = (venda, docId) => {
     return firebase.firestore().collection('sales')
     .doc(docId).set(venda, { merge: true })
@@ -29,16 +37,22 @@ const finalizarVenda = async (venda) => {
 
         return updateProduct({
             quantidade: produto.quantidade - produto.quantidadeCarrinho,
-            historicoVenda,
+            historicoVenda
         }, produto.id)
     })
 
-    venda.produtos.forEach(produto => {
+
+    const products = venda.produtos.map(produto => {
         delete produto.historicoVenda
         return produto
     })
 
-    const salvarVenda = firebase.firestore().collection('sales').doc().set(venda)
+    const sale = {
+        ...venda,
+        produtos: products
+    }
+
+    const salvarVenda = await firebase.firestore().collection('sales').doc().set(sale)
 
     promises.push(salvarVenda)
 
@@ -49,4 +63,5 @@ export {
     finalizarVenda,
     atualizarVenda,
     buscarVendasByMesAno,
+    buscarVendasPagtoPendente,
 }

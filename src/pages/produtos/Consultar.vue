@@ -3,8 +3,8 @@
         <md-card-header>
           <div class="md-title">Consultar produtos</div>
         </md-card-header>
+        
         <md-table>
-
         <md-table-row>
             <md-table-head>Código</md-table-head>
             <md-table-head>Descrição</md-table-head>

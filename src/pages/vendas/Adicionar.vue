@@ -92,16 +92,31 @@
                 <p><b>Desconto: {{ descontoGeral }}%</b></p>
             </div>
             <p>Quantidade de itens: {{ shoppingCartTotaItems }}</p>
-            <p><b>Total a pagar: {{ descontoGeral ? shoppingCartTotalWithDiscount : shoppingCartTotal }}</b></p>
+            <p><b>Total a pagar: {{ valorTotalAPagar | currency }}</b></p>
 
             <br>
             <br>
-            <p>Selecione a forma de pagamento: </p>
+            <p><b>Selecione a forma de pagamento: </b></p>
             <div class="q-gutter-sm">
                 <q-radio v-model="formaPagamento" val="dinheiro" label="Dinheiro" />
                 <q-radio v-model="formaPagamento" val="debito" label="Cartão de Débito" />
                 <q-radio v-model="formaPagamento" val="credito" label="Cartão de Crédito" />
                 <q-radio v-model="formaPagamento" val="naoPago" label="Não pago" />
+            </div>
+            <br>
+            <div v-show="formaPagamento === 'credito'">
+                <p><b>Número de parcelas</b></p>
+                <q-input
+                    v-model.number="numeroParcelas"
+                    type="number"
+                    min="1"
+                    filled
+                    style="max-width: 90px"
+                />
+                <br>
+                <p><b>parcelas: </b></p>
+                <div>1 - {{ valoresParcela.valorPrimeiraParcela | currency }}</div>
+                <div v-for="(parcela, index) in (numeroParcelas - 1)" :key="index">{{index + 2}} - {{ valoresParcela.valorParcela | currency }}</div>
             </div>
         </div>
 
@@ -144,11 +159,11 @@
                 </q-card-section>
 
                 <q-card-section class="q-pt-none">
-                    <p>Valor total: {{ shoppingCartTotal }}</p>
+                    <p>Valor total: {{ valorTotalAPagar | currency }}</p>
                     <p>Quantidade total de itens: {{ shoppingCartTotaItems }}</p>
                     
                     <b>Valor pago:</b>
-                    <q-input dense v-model="totalPaid" autofocus v-money="money" />
+                    <q-input dense v-model="totalPaid" :disable="formaPagamento === 'credito'" autofocus v-money="money" />
                 </q-card-section>
 
                 <q-card-actions align="right" class="text-primary">
@@ -240,7 +255,8 @@ export default {
         },
         openDiscountDialog: false,
         descontoGeral: 0,
-        formaPagamento: ''
+        formaPagamento: '',
+        numeroParcelas: 1,
 
     }),
     computed: {
@@ -269,6 +285,15 @@ export default {
                 return this.shoppingCart.reduce((acc, b) => acc + b.quantidadeCarrinho, 0)
             }
             return total
+        },
+        valoresParcela() {
+            if (!this.numeroParcelas) return 0
+            const valorTotal = getNumberCurrency(this.descontoGeral ? this.shoppingCartTotalWithDiscount : this.shoppingCartTotal)
+            return this.getValorParcelas(valorTotal, this.numeroParcelas)
+        },
+        valorTotalAPagar() {
+            const valorTotal = this.descontoGeral ? this.shoppingCartTotalWithDiscount : this.shoppingCartTotal
+            return getNumberCurrency(valorTotal)
         }
     },
     created() {
@@ -277,6 +302,12 @@ export default {
         }
     },
     methods: {
+        getValorParcelas(precoTotal, numeroParcelas) {
+        const valorParcela = parseFloat((precoTotal / numeroParcelas).toFixed(2));
+        const valorPrimeiraParcela = parseFloat((precoTotal - (valorParcela * (numeroParcelas - 1))).toFixed(2));
+
+        return { valorPrimeiraParcela , valorParcela };
+        },
         async getCustomer() {
             try {
                 if (this.idParam) {
@@ -315,7 +346,7 @@ export default {
             const product = {
                 ...value,
                 quantidadeCarrinho: 1,
-                precoTotalItem: value.precoVenda,
+                precoTotalItem: parseFloat(value.precoVenda.toFixed(2)),
             }
 
             this.shoppingCart.push(product)
@@ -350,6 +381,7 @@ export default {
         },
         async finalizarVenda() {
             try {
+                let historicoPagamento = null
                 this.openTotalPaidDialog = false
                 const valorTotal = getNumberCurrency(this.shoppingCartTotal)
                 const valorTotalDesconto = getNumberCurrency(this.shoppingCartTotalWithDiscount)
@@ -357,24 +389,47 @@ export default {
                 const desconto = this.descontoGeral || 0
 
                 const valorTotalAPagar = desconto ? valorTotalDesconto : valorTotal
-                const valorTotalPago = getNumberCurrency(this.totalPaid)
-                 
+                const valorPago = getNumberCurrency(this.totalPaid)
+                const saldoDevedor = valorTotalAPagar - valorPago
 
-                const venda = {
+                historicoPagamento = {
+                    valorPago,
+                    dataPagamento: new Date(),
+                    saldoDevedor,
+                    formaPagamento: this.formaPagamento,
+                }
+
+                if (this.formaPagamento === 'credito') {
+                    if (!this.numeroParcelas) {
+                        this.$q.notify({
+                            type: 'negative',
+                            message: 'Falha ao efetuar venda.'
+                        })
+                        return
+                    }
+
+                    historicoPagamento = {
+                        ...historicoPagamento,
+                        numeroParcelas: this.numeroParcelas,
+                        valorPrimeiraParcela: this.valoresParcela.valorPrimeiraParcela,
+                        valorParcelasRestantes: this.valoresParcela.valorParcela
+                    }
+                }
+
+                let venda = {
                     cliente: this.customer,
                     produtos: this.shoppingCart,
                     valorTotal,
                     desconto,
-                    valorTotalDesconto,
+                    valorTotalAPagar,
                     quantidadeTotalItens: this.shoppingCartTotaItems,
                     dataVenda: new Date(),
-                    historicoPagamento: [{
-                        valorTotalPago,
-                        dataPagamento: new Date(),
-                        saldoDevedor: valorTotalAPagar - valorTotalPago
-                    }],
+                    historicoPagamento: [ historicoPagamento ],
                     situacao: 'ATIVA',
-                    formaPagamento: this.formaPagamento
+
+                    saldoDevedor,
+                    valorTotalPago: valorPago,     
+                    statusPagamento: saldoDevedor ? 'PENDENTE' : 'PAGO',
                 }
 
                 await finalizarVenda(venda)
@@ -425,7 +480,9 @@ export default {
                 })
                 return
             }
+
             this.openTotalPaidDialog = true
+            this.totalPaid =  this.$options.filters.currency(this.valorTotalAPagar)
         }
     }
 }

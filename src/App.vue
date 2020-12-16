@@ -114,7 +114,7 @@ export default {
 
   .view-container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1800px;
     padding: 28px;
   }
 
