@@ -129,6 +129,8 @@
             if (productDoc.exists) {
                 const product = productDoc.data()
                 this.form = product
+                this.form.precoCusto = this.$options.filters.currency(this.form.precoCusto)
+                this.form.precoVenda = this.$options.filters.currency(this.form.precoVenda)
             }
         }
         this.isLoaded = true
@@ -150,7 +152,7 @@
 
         const product = { 
             ...this.form,
-            normalizedDescricao: normalizeString(this.form.descricao),
+            normalizedDescricao: normalizeString(this.form.descricao).trim(),
             precoVenda,
             precoCusto,
             quantidade,
@@ -164,6 +166,11 @@
             await saveProduct(product)
         }        
         this.sending = false
+        this.$q.notify({
+          type: 'positive',
+          message: 'Produto salvo com sucesso!'
+        })
+        this.$router.push('/produtos/consultar')
       },
       validateProduct () {
         this.$v.$touch()

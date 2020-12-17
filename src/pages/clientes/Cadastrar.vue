@@ -180,8 +180,14 @@
         const idCustomer = this.idParam;
         const customer = { 
           ...this.form,
+          name: this.form.name ? this.form.name.trim() : '',
           normalizedCpf: removeNonNumbers(this.form.cpf),
-          normalizedName: normalizeString(this.form.name),
+          normalizedName: normalizeString(this.form.name).trim(),
+          logradouro: this.form.logradouro ? this.form.logradouro.trim() : '',
+          email: this.form.email ? this.form.email.trim() : '',
+          numero: this.form.numero ? this.form.numero.trim() : '',
+          complemento: this.form.complemento ? this.form.complemento.trim() : '',
+          cidade: this.form.cidade ? this.form.cidade.trim() : '',
         }
         this.sending = true
         if (idCustomer) {
@@ -190,6 +196,11 @@
           await saveCustomer(customer)
         }        
         this.sending = false
+        this.$q.notify({
+          type: 'positive',
+          message: 'Cliente salvo com sucesso!'
+        })
+        this.$router.push('/clientes/consultar')
       },
       validateUser () {
         this.$v.$touch()

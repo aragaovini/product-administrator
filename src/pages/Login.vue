@@ -45,6 +45,8 @@ export default {
         await firebase.auth().signInWithEmailAndPassword(email, senha)
         this.$router.push('/dashboard')
       } catch(error) {
+        /* eslint-disable */
+        console.error(error)
         this.isLoading = false
       } finally {
         this.isLoading = false
