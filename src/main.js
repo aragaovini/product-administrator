@@ -59,7 +59,10 @@ Vue.material.locale = {
 
 Vue.config.productionTip = false
 
-const env = {
+const url = window.location.href
+const isDev = url.includes('localhost') || url.includes('product-administrator-dev')
+
+const devEnv = {
   apiKey: "AIzaSyCILRTZzVD1YvdQjG0HbxHFScbwwd2U04Y",
   authDomain: "product-administrator-dev.firebaseapp.com",
   databaseURL: "https://product-administrator-dev.firebaseio.com",
@@ -70,17 +73,17 @@ const env = {
   measurementId: "G-K4D4EVFQCS"
 }
 
-// const env = {
-//   apiKey: "AIzaSyD_OkS0sCuRkcRTBasqix9BazffNJ09wfM",
-//   authDomain: "disanti-store.firebaseapp.com",
-//   projectId: "disanti-store",
-//   storageBucket: "disanti-store.appspot.com",
-//   messagingSenderId: "661641865769",
-//   appId: "1:661641865769:web:5e2b054325381c17f10a38",
-//   measurementId: "G-XKVQ5RGL7Q"
-// }
+const prodEnv = {
+  apiKey: "AIzaSyD_OkS0sCuRkcRTBasqix9BazffNJ09wfM",
+  authDomain: "disanti-store.firebaseapp.com",
+  projectId: "disanti-store",
+  storageBucket: "disanti-store.appspot.com",
+  messagingSenderId: "661641865769",
+  appId: "1:661641865769:web:5e2b054325381c17f10a38",
+  measurementId: "G-XKVQ5RGL7Q"
+};
 
-firebase.initializeApp(env)
+firebase.initializeApp(isDev ? devEnv : prodEnv)
 
 let app = undefined
 

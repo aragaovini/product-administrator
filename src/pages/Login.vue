@@ -46,6 +46,10 @@ export default {
         this.$router.push('/dashboard')
       } catch {
         this.isLoading = false
+        this.$q.notify({
+          type: 'negative',
+          message: 'Falha ao entrar. Confira o e-mail ou senha.'
+        })
       } finally {
         this.isLoading = false
       }
